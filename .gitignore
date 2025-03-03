@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# Docker
+*.log
+*.pid
+*.seed
+
+# Airflow
+airflow.db
+airflow-webserver.pid
+logs/
+
+# Sensitive
+.env
+secrets/
