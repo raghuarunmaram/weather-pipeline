@@ -1,9 +1,11 @@
+import os
 import requests
 import json
 from confluent_kafka import Producer
 from time import sleep
 
-API_KEY = "730d41399d73acd6db3acc01b0ee38d2"  # OpenWeather API key
+# Fetch API key from environment variable
+API_KEY = os.getenv("OPENWEATHER_API_KEY")  # Default to None if not set
 CITIES = ["New York", "London", "Tokyo"]  # Cities to fetch data for
 BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
 
@@ -36,6 +38,8 @@ def initialize_producer():
 
 # Fetches weather data and sends it to Kafka
 def fetch_and_send():
+    if not API_KEY:
+        raise ValueError("OPENWEATHER_API_KEY environment variable not set")
     producer = initialize_producer()
     for city in CITIES:
         try:
