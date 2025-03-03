@@ -1,7 +1,7 @@
 # Weather Pipeline
 
 ## Overview
-This project showcases a modern, real-time data engineering pipeline that collects, processes, and visualizes weather data. The pipeline integrates the following components:
+A real-time data pipeline that fetches weather data from OpenWeatherMap, streams it through Kafka, processes it with Airflow, stores it in PostgreSQL, and visualizes it in Grafana. The pipeline integrates the following components:
 
 - **Data Source**: Weather data is fetched from the OpenWeatherMap API for major cities including New York, London, and Tokyo.
 - **Streaming**: Apache Kafka, paired with ZooKeeper, handles scalable message brokering.
