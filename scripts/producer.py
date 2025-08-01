@@ -6,7 +6,7 @@ import requests
 from confluent_kafka import Producer
 
 CITIES = ["New York", "London", "Tokyo"]  # Cities to fetch data for
-BASE_URL = "http://api.openweathermap.org/data/2.5/weather"
+BASE_URL = "http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
 
 # Handles Kafka message delivery feedback
 def delivery_report(err, msg):
@@ -45,7 +45,7 @@ def fetch_and_send():
     for city in CITIES:
         try:
             response = requests.get(
-                BASE_URL, params={"q": city, "appid": api_key}, timeout=10
+                BASE_URL.format(city=city, api_key=api_key), timeout=10
             )
             if response.status_code == 200:
                 data = response.json()
