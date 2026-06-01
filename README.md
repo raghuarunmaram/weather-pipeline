@@ -1,39 +1,111 @@
-# Weather Pipeline
+# Real-Time Weather Data Pipeline
 
-## Overview
-A real-time data pipeline that fetches weather data from OpenWeatherMap, streams it through Kafka, processes it with Airflow, stores it in PostgreSQL, and visualizes it in Grafana. The pipeline integrates the following components:
+An end-to-end streaming data pipeline that ingests live weather data, streams it through Kafka, orchestrates processing with Airflow, persists to PostgreSQL, and visualizes in real time via Grafana — fully containerized with Docker Compose.
 
-- **Data Source**: Weather data is fetched from the OpenWeatherMap API for major cities including New York, London, and Tokyo.
-- **Streaming**: Apache Kafka, paired with ZooKeeper, handles scalable message brokering.
-- **Orchestration**: Apache Airflow schedules and manages data ingestion and processing tasks every 10 minutes.
-- **Storage**: Processed weather data is stored in PostgreSQL for efficient querying and persistence.
-- **Visualization**: A dynamic Grafana dashboard provides real-time insights into weather metrics such as temperature, humidity, and timestamps.
+**Stack:** Python · Apache Kafka · Apache Airflow · PostgreSQL · Grafana · Docker
 
-## Features
-- Real-time weather data collection every 10 minutes from OpenWeatherMap.
-- Scalable data streaming using Kafka for reliable message handling.
-- Robust data processing and storage in PostgreSQL with built-in error handling.
-- Interactive Grafana visualizations for monitoring temperature, humidity, and time-series trends.
+---
 
-## Dashboard Snapshot
-Below is a snapshot of the Grafana dashboard, showcasing real-time temperature and humidity trends for Tokyo and New York over a 5-hour period (as of March 3, 2025):
+## Architecture
+
+```
+OpenWeatherMap API
+        │
+        ▼
+  Python Producer  ──►  Apache Kafka  ──►  Python Consumer
+  (fetch every           (ZooKeeper)          │
+   10 minutes)                                ▼
+                                         PostgreSQL
+                                              │
+                                              ▼
+                                          Grafana
+                                    (real-time dashboard)
+```
+
+**Data flow:**
+1. A Python producer fetches weather data from OpenWeatherMap every 10 minutes for multiple cities
+2. Messages are published to a Kafka topic (ZooKeeper-managed)
+3. A Python consumer reads from Kafka and writes structured records to PostgreSQL
+4. Apache Airflow DAGs orchestrate scheduling, error handling, and retries
+5. Grafana connects to PostgreSQL to render live temperature, humidity, and time-series dashboards
+
+---
+
+## Dashboard
+
+Real-time temperature and humidity trends across cities — updated every 10 minutes:
 
 ![Grafana Weather Dashboard](assets/weather.png)
 
-The dashboard displays:
-- Temperature (in Celsius) and humidity trends for Tokyo and New York.
-- Time-series data updated every 10 minutes, covering the last 5 hours.
-- Clear, color-coded graphs for easy interpretation of weather patterns.
+---
 
-## Prerequisites
-To set up and run this project, ensure you have the following:
+## Features
 
-- **Docker** and **Docker Compose** for containerized deployment.
-- **Python 3.8+** for development and scripting.
-- An **OpenWeatherMap API key** to fetch weather data (sign up at [openweathermap.org](https://openweathermap.org) to obtain one).
+- **Real-time ingestion** — weather data polled every 10 minutes from OpenWeatherMap API
+- **Scalable streaming** — Kafka handles message brokering with ZooKeeper coordination
+- **Orchestrated processing** — Airflow DAGs manage scheduling, retries, and failure alerting
+- **Persistent storage** — structured records in PostgreSQL with efficient time-series querying
+- **Live visualization** — Grafana dashboards with color-coded temperature and humidity graphs
+- **Production-ready** — fully Dockerized, environment-variable driven, `.gitignore` enforced
 
-## Getting Started
-**Clone the Repository**:
-   ```bash
-   git clone https://github.com/raghuarunmaram/weather-pipeline
-   cd weather-pipeline
+---
+
+## Quick start
+
+**Prerequisites:** Docker, Docker Compose, Python 3.8+, OpenWeatherMap API key
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/raghuarunmaram/weather-pipeline
+cd weather-pipeline
+
+# 2. Add your API key
+echo "OPENWEATHER_API_KEY=your_key_here" > .env
+
+# 3. Start all services
+docker-compose up -d
+
+# 4. Access Airflow UI
+open http://localhost:8080   # default: airflow / airflow
+
+# 5. Access Grafana dashboard
+open http://localhost:3000   # default: admin / admin
+```
+
+---
+
+## Project structure
+
+```
+weather-pipeline/
+├── dags/               # Airflow DAGs for orchestration
+├── scripts/            # Kafka producer & consumer scripts
+├── assets/             # Dashboard screenshots
+├── docker-compose.yml  # Full stack definition
+├── requirements.txt    # Python dependencies
+└── .gitignore
+```
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| Data source | OpenWeatherMap REST API |
+| Streaming | Apache Kafka + ZooKeeper |
+| Orchestration | Apache Airflow |
+| Storage | PostgreSQL |
+| Visualization | Grafana |
+| Language | Python 3.8+ |
+| Infrastructure | Docker + Docker Compose |
+
+---
+
+## About the author
+
+**Raghu Arun Maram** — Senior Data Engineer @ Meta, Ex-AWS
+
+I build large-scale data pipelines and AI-native agentic systems. This project reflects the same patterns I use in production: event-driven ingestion, orchestrated processing, and observability-first design.
+
+[LinkedIn](https://www.linkedin.com/in/raghuarunmaram/) · [GitHub](https://github.com/raghuarunmaram) · raghuarun34@gmail.com
